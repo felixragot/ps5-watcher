@@ -140,32 +140,31 @@ def main(argv=None):
         try:
             if args.force_notify:
                 sku = product["sku"]
-                parsed = {
-                    "title": product["name"],
-                    "price": "499,99",
-                    "currency": "EUR",
-                    "url": product["url"],
-                    "sku": sku,
-                    "image": None,
-                }
-                LOGGER.info("[FORCE-NOTIFY] Produit simulé disponible | SKU=%s", sku)
-                if args.dry_run:
-                    LOGGER.info("[DRY-RUN] Notification Disponible | SKU=%s", sku)
+                html_text = fetch_page(product["url"])
+                parsed = parse_page(html_text, product) if html_text else None
+                if not parsed or not parsed.get("image"):
+                    LOGGER.error(
+                        "Test forcé annulé : métadonnées ou image du produit introuvables | SKU=%s",
+                        sku,
+                    )
+                    successful_cycle = False
                 else:
-                    now = datetime.now(PARIS)
-                    if send_notification(
-                        token,
-                        chat_id,
-                        "Disponible",
-                        parsed,
-                        now.strftime("%d/%m/%Y %H:%M"),
-                    ):
-                        state[sku] = {
-                            "status": "DISPONIBLE",
-                            "last_message": now.isoformat(timespec="seconds"),
-                        }
+                    LOGGER.info("[FORCE-NOTIFY] Disponibilité simulée avec les données réelles | SKU=%s", sku)
+                    if args.dry_run:
+                        LOGGER.info("[DRY-RUN] Notification Disponible | SKU=%s", sku)
                     else:
-                        LOGGER.error("Notification forcée échouée | SKU=%s", sku)
+                        now = datetime.now(PARIS)
+                        if send_notification(
+                            token,
+                            chat_id,
+                            "Disponible (test)",
+                            parsed,
+                            now.strftime("%d/%m/%Y %H:%M"),
+                        ):
+                            LOGGER.info("Notification de test envoyée | SKU=%s", sku)
+                        else:
+                            LOGGER.error("Notification forcée échouée | SKU=%s", sku)
+                            successful_cycle = False
             else:
                 if not process_product(product, state, token, chat_id, args.dry_run):
                     successful_cycle = False

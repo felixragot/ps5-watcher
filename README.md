@@ -39,16 +39,15 @@ py main.py --dry-run --jitter 0
 py -m unittest discover -s tests -v
 ```
 
-Sous PowerShell, renseigner ensuite les variables :
+Remplir `.env` avec le token et le chat ID. Le programme charge ce fichier automatiquement sans remplacer les variables déjà définies dans l'environnement.
+
+Pour vérifier le message sans l'envoyer :
 
 ```powershell
-$env:TELEGRAM_BOT_TOKEN="..."
-$env:TELEGRAM_CHAT_ID="..."
-py main.py --dry-run --jitter 0
 py main.py --force-notify --dry-run --jitter 0
 ```
 
-`--force-notify --dry-run` simule l'envoi sans réseau Telegram. Pour un vrai test Telegram :
+Le mode forcé simule la disponibilité, mais récupère le vrai titre, prix, SKU et image sur la page produit. Pour envoyer le message de test avec le bouton « Acheter » sur Telegram :
 
 ```powershell
 py main.py --force-notify --jitter 0

@@ -2,6 +2,8 @@ from pathlib import Path
 import json
 import os
 
+from dotenv import load_dotenv
+
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 PRODUCTS_FILE = ROOT_DIR / "config" / "products.json"
@@ -27,6 +29,7 @@ def load_products():
 
 
 def load_environment():
+    load_dotenv(ROOT_DIR / ".env")
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     if not token or not chat_id:
