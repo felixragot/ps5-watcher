@@ -19,6 +19,43 @@ def _walk_json(value):
             yield from _walk_json(child)
 
 
+def _normalize_next_js_text(html_text):
+    normalized = html.unescape(html_text)
+    normalized = normalized.replace("\\u0022", '"').replace("\\u0027", "'")
+    normalized = re.sub(r'\\+"', '"', normalized)
+    return normalized
+
+
+def _extract_gamecta_type(normalized_text, sku):
+    positions = []
+    start = 0
+    while True:
+        position = normalized_text.find(sku, start)
+        if position < 0:
+            break
+        positions.append(position)
+        start = position + len(sku)
+
+    for position in positions:
+        window_start = max(0, position - 500)
+        window_end = min(len(normalized_text), position + 5000)
+        window = normalized_text[window_start:window_end]
+        if "GameCTA" not in window:
+            continue
+
+        sku_in_window = position - window_start
+        gamecta_in_window = window.rfind("GameCTA", 0, sku_in_window + 1)
+        if gamecta_in_window < 0:
+            continue
+
+        block = window[gamecta_in_window:sku_in_window + 5000]
+        type_match = re.search(r'"type"\s*:\s*"([^"]+)"', block)
+        if type_match:
+            return type_match.group(1)
+
+    return None
+
+
 def parse_page(html_text, product):
     if not html_text or not html_text.strip():
         return None
@@ -69,20 +106,13 @@ def parse_page(html_text, product):
                     image = item["image"]
                     result["image"] = image[0] if isinstance(image, list) else image
 
-    normalized = html.unescape(html_text).replace("\\\"", "\"")
-    sku_index = normalized.find(product["sku"])
-    if sku_index >= 0:
-        window = normalized[max(0, sku_index - 4000):sku_index + 4000]
-        type_match = re.search(r'"type"\s*:\s*"([^"]+)"', window)
-        if type_match:
-            result["button_type"] = type_match.group(1)
-
-        cta_match = re.search(r"GameCTA.*?" + re.escape(product["sku"]) + r".*?\}", window)
-        if cta_match:
-            cta = cta_match.group(0)
-            type_match = re.search(r'"type"\s*:\s*"([^"]+)"', cta)
-            if type_match:
-                result["button_type"] = type_match.group(1)
+    normalized = _normalize_next_js_text(html_text)
+    result["button_type"] = _extract_gamecta_type(normalized, product["sku"])
+    if result["button_type"] is None:
+        LOGGER.warning(
+            "Champ type du bloc GameCTA du SKU %s absent de la réponse HTTP",
+            product["sku"],
+        )
 
     for element in soup.find_all(attrs={"data-qa": re.compile(r"mfeCtaMain#offer.*#finalPrice")}):
         text = element.get_text(" ", strip=True)

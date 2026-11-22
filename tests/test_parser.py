@@ -45,6 +45,12 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(parsed["button_type"], "ADD_TO_CART")
         self.assertEqual(classify_signals(parsed), "DISPONIBLE")
 
+    def test_parses_escaped_nextjs_gamecta_fixture(self):
+        fixture_path = Path(__file__).parent / "fixtures" / "nextjs_gamecta_unavailable.html"
+        html = fixture_path.read_text(encoding="utf-8")
+        parsed = parse_page(html, self.product)
+        self.assertEqual(parsed["button_type"], "UNAVAILABLE")
+
 
 if __name__ == "__main__":
     unittest.main()
