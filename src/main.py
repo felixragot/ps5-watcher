@@ -54,7 +54,7 @@ def process_product(product, state, token=None, chat_id=None, dry_run=False):
     if parsed is None:
         parsed = {
             "title": product["name"],
-            "price": "499,99",
+            "price": "649,99",
             "currency": "EUR",
             "url": product["url"],
             "sku": sku,

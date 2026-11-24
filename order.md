@@ -1,4 +1,4 @@
-# order.md — Bot d'alerte de disponibilité de la PS5 Édition numérique Slim (PlayStation France → Telegram)
+# order.md — Bot d'alerte de disponibilité de la PS5 avec lecteur 1 To (PlayStation France → Telegram)
 
 > **Document autonome (version 4).** Il résume toute la discussion préparatoire entre l'utilisateur et un assistant, pour qu'une IA agent (GitHub Copilot en mode agent, prévu) ou un humain puisse tout construire sans avoir assisté aux échanges. Les décisions de la section 3 sont **fermes**. Les points marqués ⚠️ sont **non vérifiés** : à tester avant de coder dessus.
 
@@ -6,7 +6,7 @@
 
 ## 1. Résumé
 
-1. Un script Python vérifie toutes les ~5 minutes la **page produit** de la *Console PlayStation 5 Édition numérique (modèle Slim), 499,99 €* sur playstation.com/fr-fr.
+1. Un script Python vérifie toutes les ~5 minutes la **page produit** de la *Console PlayStation 5 avec lecteur, 1 To, 649,99 €* sur playstation.com/fr-fr.
 2. Il lit le champ structuré de disponibilité de la page (`availability` + `type` du bouton d'achat) et détermine un statut : `DISPONIBLE`, `INDISPONIBLE` ou `INCONNU`.
 3. Quand le produit passe de `INDISPONIBLE` à `DISPONIBLE` (ou `INCONNU`), il envoie un message Telegram avec les infos et un bouton cliquable ; tant qu'il reste disponible, il envoie un rappel toutes les 30 minutes.
 4. Il tourne gratuitement sur **GitHub Actions** (dépôt **public**), sans dépendre du PC de l'utilisateur.
@@ -24,7 +24,7 @@
 
 | # | Sujet | Décision |
 |---|---|---|
-| 1 | Produit surveillé | **Uniquement** la console PS5 Édition numérique, modèle Slim (sans lecteur), 499,99 € |
+| 1 | Produit surveillé | **Uniquement** la console PS5 avec lecteur, modèle Slim 1 To, 649,99 € |
 | 2 | Source | Sa page produit (voir §4). Une requête = une page |
 | 3 | Source du statut | Champs structurés `availability` (JSON-LD) et `type` du bouton d'achat ; le texte visible sert de secours/confirmation |
 | 4 | Extensibilité | Liste de produits dans un fichier de configuration (JSON ou YAML) : nom, URL, SKU. Aujourd'hui **un seul** produit ; en ajouter plus tard ne doit demander aucune modification du code. Chaque produit = une page visitée, avec une pause aléatoire de quelques secondes entre deux pages |
@@ -46,17 +46,17 @@
 
 ## 4. Le produit et la page (constats vérifiés dans des exports réseau du 22/11/2026)
 
-- **URL** : `https://www.playstation.com/fr-fr/ps5/playstation-digital-edition-console-model-group-slim/` (URL canonique de la page).
-- **Nom** : « Console édition numérique PlayStation®5 (modèle - slim)* ».
-- **Prix** : 499,99 EUR.
-- **Identifiant produit** : `PSD001-PSDE01834_87-PS5DIGITAL3PVB7E`.
-- **SKU** (identifiant de la référence de vente, comme un code-barres) : `PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E`. Présent aussi dans les balises `<meta name="productId">` et `<meta name="skus">` (avec `defaultProduct = true`).
+- **URL** : `https://www.playstation.com/fr-fr/ps5/1-tb-disc/product/PSD001-PSDE01929_59-PS5CONSOLEHB2OYE/` (URL de la page produit).
+- **Nom** : « Console PlayStation®5 - 1 To ».
+- **Prix** : 649,99 EUR.
+- **Identifiant produit** : `PSD001-PSDE01929_59-PS5CONSOLEHB2OYE`.
+- **SKU** (identifiant de la référence de vente, comme un code-barres) : `PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO`. Présent aussi dans les balises `<meta name="productId">` et `<meta name="skus">` (avec `defaultProduct = true`).
 - **Statut constaté ce jour** : indisponible.
 - **Images** : balise `<meta name="image">` et champ `image` du JSON-LD (adresses `gmedia.playstation.com`). Éviter l'image `og:image`, qui est un visuel générique.
 
 ### 4.1 Signaux de disponibilité présents dans le HTML (indisponible, constatés)
 
-1. **JSON-LD** : un bloc `<script type="application/ld+json">` de type `Product`, avec `offers.availability = "https://schema.org/OutOfStock"`, `price = "499.99"`, `priceCurrency = "EUR"`, `sku`, `name`, `image`, `url`.
+1. **JSON-LD** : un bloc `<script type="application/ld+json">` de type `Product`, avec `offers.availability = "https://schema.org/OutOfStock"`, `price = "649.99"`, `priceCurrency = "EUR"`, `sku`, `name`, `image`, `url`.
 2. **Bouton d'achat (données de la page)** : objet `GameCTA` pour le SKU, avec `"type":"UNAVAILABLE"`, `"hideCta":true` et `"priceOrText":"msgid_not_available_purchase"`. Ces données sont dans le HTML initial, à l'intérieur du flux de données Next.js (`self.__next_f.push(...)`), où les guillemets sont **échappés** (`\"`) : le parsing doit en tenir compte.
 3. **Texte visible** : « Non disponible à l'achat » dans l'élément `data-qa="mfeCtaMain#offer0#finalPrice"`.
 
@@ -147,9 +147,9 @@ Exemple de `config/products.json` :
 ```json
 [
   {
-    "name": "PS5 Édition numérique (Slim)",
-    "url": "https://www.playstation.com/fr-fr/ps5/playstation-digital-edition-console-model-group-slim/",
-    "sku": "PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E"
+    "name": "Console PlayStation®5 - 1 To",
+    "url": "https://www.playstation.com/fr-fr/ps5/1-tb-disc/product/PSD001-PSDE01929_59-PS5CONSOLEHB2OYE/",
+    "sku": "PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO"
   }
 ]
 ```

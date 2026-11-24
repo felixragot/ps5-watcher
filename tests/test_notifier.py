@@ -11,7 +11,7 @@ class NotifierTests(unittest.TestCase):
     def test_format_message_escapes_html_and_url_quotes(self):
         parsed = {
             "title": "Console <PS5>",
-            "price": "499,99",
+            "price": "649,99",
             "currency": "EUR",
             "sku": "SKU-123",
             "url": 'https://example.test/product?x="quoted"&y=1',
@@ -59,7 +59,7 @@ class NotifierTests(unittest.TestCase):
 
         parsed = {
             "title": "Console PS5",
-            "price": "499,99",
+            "price": "649,99",
             "currency": "EUR",
             "sku": "SKU-123",
             "url": "https://example.test/ps5",
@@ -90,7 +90,7 @@ class NotifierTests(unittest.TestCase):
         mock_post.return_value = response
         parsed = {
             "title": "Console PS5",
-            "price": "499,99",
+            "price": "649,99",
             "currency": "EUR",
             "sku": "SKU-123",
             "url": "https://example.test/ps5",

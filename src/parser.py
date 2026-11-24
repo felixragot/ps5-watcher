@@ -63,7 +63,7 @@ def parse_page(html_text, product):
     soup = BeautifulSoup(html_text, "html.parser")
     result = {
         "title": product["name"],
-        "price": "499,99",
+        "price": "649,99",
         "currency": "EUR",
         "url": product["url"],
         "sku": product["sku"],

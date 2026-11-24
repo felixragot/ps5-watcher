@@ -5,25 +5,25 @@ from src.parser import parse_page
 from src.status import classify_signals
 
 
-SKU = "PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E"
+SKU = "PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO"
 
 
 class ParserTests(unittest.TestCase):
     def setUp(self):
         self.product = {
-            "name": "PS5 Édition numérique (Slim)",
-            "url": "https://www.playstation.com/fr-fr/ps5/playstation-digital-edition-console-model-group-slim/",
+            "name": "Console PlayStation®5 - 1 To",
+            "url": "https://www.playstation.com/fr-fr/ps5/1-tb-disc/product/PSD001-PSDE01929_59-PS5CONSOLEHB2OYE/",
             "sku": SKU,
         }
 
     def test_parses_unavailable_fixture(self):
         html = """
         <html><head>
-        <meta name="name" content="Console édition numérique PS5 (modèle - slim)">
+        <meta name="name" content="Console PlayStation®5 - 1 To">
         <meta name="image" content="https://gmedia.playstation.com/test.jpg">
         </head><body>
-        <script type="application/ld+json">{"@type":"Product","sku":"PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E","offers":{"price":"499.99","priceCurrency":"EUR","availability":"https://schema.org/OutOfStock","url":"https://example.test/ps5"}}</script>
-        <div>{"GameCTA":{"sku":"PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E","type":"UNAVAILABLE"}}</div>
+        <script type="application/ld+json">{"@type":"Product","sku":"PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO","offers":{"price":"649.99","priceCurrency":"EUR","availability":"https://schema.org/OutOfStock","url":"https://example.test/ps5"}}</script>
+        <div>{"GameCTA":{"sku":"PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO","type":"UNAVAILABLE"}}</div>
         <div data-qa="mfeCtaMain#offer0#finalPrice">Non disponible à l'achat</div>
         </body></html>
         """
@@ -35,8 +35,8 @@ class ParserTests(unittest.TestCase):
     def test_parses_available_fixture(self):
         html = """
         <html><head><meta name="name" content="Console PS5"></head><body>
-        <script type="application/ld+json">{"@type":"Product","sku":"PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E","offers":{"price":"499.99","priceCurrency":"EUR","availability":"https://schema.org/InStock","url":"https://example.test/ps5"}}</script>
-        <div>{"GameCTA":{"sku":"PSD001-PSDE01834_87-PS5DIGITAL3PVB7E-E000O3L7E","type":"ADD_TO_CART"}}</div>
+        <script type="application/ld+json">{"@type":"Product","sku":"PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO","offers":{"price":"649.99","priceCurrency":"EUR","availability":"https://schema.org/InStock","url":"https://example.test/ps5"}}</script>
+        <div>{"GameCTA":{"sku":"PSD001-PSDE01929_59-PS5CONSOLEHB2OYE-E000Y5GPO","type":"ADD_TO_CART"}}</div>
         <div data-qa="mfeCtaMain#offer0#finalPrice">Ajouter au panier</div>
         </body></html>
         """
